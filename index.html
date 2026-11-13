@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c1020">
+  <title>Hole Fight | Tiers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="#home"><span class="brand-mark">HF</span><span>HOLE<span class="brand-accent">FIGHT</span><small>COMMUNITY TIERS</small></span></a>
+    <nav>
+      <a class="nav-link active" href="#home">Home</a>
+      <a class="nav-link" href="#tiers">Tiers</a>
+      <a class="nav-link" href="#about">About</a>
+    </nav>
+    <div class="auth-actions" id="authActions">
+      <button class="btn btn-ghost" id="loginOpen">Login</button>
+      <button class="btn btn-primary" id="registerOpen">Register</button>
+    </div>
+    <div class="user-actions hidden" id="userActions">
+      <span class="signed-in" id="signedInAs"></span>
+      <button class="btn btn-ghost hidden" id="adminOpen">Admin Panel</button>
+      <button class="btn btn-primary" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> COMMUNITY-BASED TIERLIST</div>
+        <h1>PROVE YOUR<br><span>HOLE FIGHT</span><br>SKILL.</h1>
+        <p>A community tier list for Hole Fight players. Get tested, earn your tier and climb the rankings.</p>
+        <div class="hero-buttons"><a class="btn btn-primary btn-large" href="#tiers">View rankings <span>↗</span></a><a class="btn btn-ghost btn-large" href="#about">How it works</a></div>
+      </div>
+      <div class="hero-art">
+        <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div>
+        <div class="pickaxe">⛏</div>
+        <div class="art-label"><span>HF</span><div><b>HOLE FIGHT</b><small>UNOFFICIAL COMMUNITY TESTING</small></div></div>
+        <div class="floating-chip chip-one">HT1</div><div class="floating-chip chip-two">LT5</div>
+      </div>
+    </section>
+
+    <section class="ranking-section" id="tiers">
+      <div class="section-heading">
+        <div><div class="eyebrow">THE COMMUNITY LEADERBOARD</div><h2>TOP <span>PLAYERS</span></h2></div>
+        <div class="list-switch" role="tablist" aria-label="Account type">
+          <button class="switch-btn active" data-list="premium">Premium</button>
+          <button class="switch-btn" data-list="cracked">Cracked</button>
+        </div>
+      </div>
+      <div class="podium" id="podium">
+        <div class="empty-state">Loading player rankings...</div>
+      </div>
+      <div class="table-head"><span>RANK</span><span>PLAYER</span><span>TIER</span><span>POINTS</span></div>
+      <div class="player-list" id="playerList"><div class="empty-state">Loading...</div></div>
+      <p class="disclaimer">Hole Fight Tiers is an unofficial community project and is not affiliated with Mojang or Microsoft.</p>
+    </section>
+
+    <section class="about-section" id="about">
+      <div class="eyebrow">ABOUT THE PROJECT</div><h2>ONE MODE. <span>ONE COMMUNITY.</span></h2>
+      <p>Players can receive a community-assigned tier after being tested. Premium and cracked account rankings are displayed separately.</p>
+      <div class="about-cards">
+        <article><div class="card-icon">01</div><h3>Get tested</h3><p>Play a test match with a tester from the community.</p></article>
+        <article><div class="card-icon">02</div><h3>Earn a tier</h3><p>An administrator adds your result to the correct leaderboard.</p></article>
+        <article><div class="card-icon">03</div><h3>Climb up</h3><p>Improve your skill and aim for the highest tier.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer><a class="brand footer-brand" href="#home"><span class="brand-mark">HF</span><span>HOLE<span class="brand-accent">FIGHT</span><small>COMMUNITY TIERS</small></span></a><span>Unofficial community tier list</span><span>© <span id="year"></span> Hole Fight Tiers</span></footer>
+
+  <div class="modal-backdrop hidden" id="authModal">
+    <section class="modal">
+      <button class="modal-close" id="authClose" aria-label="Close">×</button>
+      <div class="eyebrow">WELCOME TO THE COMMUNITY</div><h2 id="authTitle">CREATE ACCOUNT</h2>
+      <p class="modal-subtitle" id="authSubtitle">Choose a unique username and password.</p>
+      <form id="authForm">
+        <label>Username<input id="authUsername" type="text" minlength="3" maxlength="16" pattern="[A-Za-z0-9_]+" autocomplete="username" required placeholder="YourMinecraftName"></label>
+        <label>Password<input id="authPassword" type="password" minlength="8" autocomplete="current-password" required placeholder="At least 8 characters"></label>
+        <button class="btn btn-primary submit-btn" id="authSubmit" type="submit">Create account</button>
+        <div class="form-message" id="authMessage"></div>
+      </form>
+      <button class="text-button" id="authModeSwitch">Already have an account? Login</button>
+      <small class="fine-print">Use a password you do not use on other websites. This account is for this tier list only.</small>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="adminModal">
+    <section class="modal admin-modal">
+      <button class="modal-close" id="adminClose" aria-label="Close">×</button>
+      <div class="eyebrow">RESTRICTED ACCESS</div><h2>ADMIN PANEL</h2>
+      <p class="modal-subtitle">Add or update a player's community tier.</p>
+      <form id="tierForm">
+        <label>Player username<input id="tierUsername" type="text" required placeholder="Minecraft username"></label>
+        <div class="form-grid">
+          <label>Leaderboard<select id="tierList"><option value="premium">Premium</option><option value="cracked">Cracked</option></select></label>
+          <label>Tier<select id="tierValue"><option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option><option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option></select></label>
+        </div>
+        <button class="btn btn-primary submit-btn" type="submit">Save tier</button>
+        <div class="form-message" id="tierMessage"></div>
+      </form>
+      <div class="admin-divider"></div>
+      <h3>Remove player tier</h3>
+      <form id="removeForm"><label>Player username<input id="removeUsername" required placeholder="Minecraft username"></label><label>Leaderboard<select id="removeList"><option value="premium">Premium</option><option value="cracked">Cracked</option></select></label><button class="btn btn-danger submit-btn" type="submit">Remove from leaderboard</button><div class="form-message" id="removeMessage"></div></form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
