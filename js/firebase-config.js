@@ -7,4 +7,4 @@ export const firebaseConfig = {
   appId: "1:410165349047:web:013fdb5b51f12ecfe95b32"
 };
 
-export const ADMIN_UID = "PASTE_BORSCUFASOLE_AUTH_UID_HERE";
+export const ADMIN_UID = "mQKexyjA1Uhbks9cEbaQHWD8TLz1";
