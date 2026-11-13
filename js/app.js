@@ -30,7 +30,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-
 const tierPoints = {
   HT1: 1000,
   LT1: 900,
@@ -43,7 +42,6 @@ const tierPoints = {
   HT5: 200,
   LT5: 100
 };
-
 
 let authMode = "register";
 let activeList = "premium";
@@ -75,7 +73,6 @@ function toast(message) {
 
   el.textContent = message;
   el.classList.add("show");
-
   setTimeout(() => el.classList.remove("show"), 2600);
 }
 
@@ -114,6 +111,273 @@ function skinAvatar(name, fullBody = false) {
   `;
 }
 
+/* PREMIUM PODIUM DESIGN */
+
+function installPodiumStyles() {
+  if ($("holeFightPodiumStyles")) return;
+
+  const style = document.createElement("style");
+  style.id = "holeFightPodiumStyles";
+
+  style.textContent = `
+    #podium {
+      display: grid !important;
+      grid-template-columns: 1fr 1.12fr 1fr !important;
+      align-items: end !important;
+      gap: 20px !important;
+      min-height: 390px !important;
+      padding: 35px 12px 12px !important;
+    }
+
+    #podium .podium-card {
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      min-width: 0 !important;
+      min-height: 270px !important;
+      padding: 22px 12px 24px !important;
+      border-radius: 18px !important;
+      overflow: hidden !important;
+      transition: transform .25s ease, box-shadow .25s ease !important;
+      background: linear-gradient(160deg,#171d2d,#0d1220) !important;
+    }
+
+    #podium .podium-card:hover {
+      transform: translateY(-7px) !important;
+    }
+
+    #podium .podium-card.second {
+      min-height: 285px !important;
+      border: 1px solid #aeb9cc !important;
+      background: linear-gradient(160deg,#343d4d 0%,#171d2b 48%,#101522 100%) !important;
+      box-shadow: 0 12px 35px #aeb9cc18, inset 0 1px #ffffff22 !important;
+    }
+
+    #podium .podium-card.first {
+      min-height: 345px !important;
+      border: 1px solid #f3c75e !important;
+      background: linear-gradient(160deg,#59451c 0%,#302512 42%,#111321 100%) !important;
+      box-shadow: 0 0 45px #f4c75e25, inset 0 1px #fff0bd55 !important;
+      z-index: 2 !important;
+    }
+
+    #podium .podium-card.third {
+      min-height: 255px !important;
+      border: 1px solid #bd8058 !important;
+      background: linear-gradient(160deg,#573522 0%,#302016 48%,#111321 100%) !important;
+      box-shadow: 0 12px 35px #bd805820, inset 0 1px #ffe0c222 !important;
+    }
+
+    #podium .podium-card::before {
+      content: "";
+      position: absolute;
+      top: -75px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 190px;
+      height: 150px;
+      border-radius: 50%;
+      filter: blur(45px);
+      opacity: .18;
+      pointer-events: none;
+    }
+
+    #podium .second::before {
+      background: #c5d0e2;
+    }
+
+    #podium .first::before {
+      background: #ffcf59;
+      opacity: .28;
+    }
+
+    #podium .third::before {
+      background: #d18b5e;
+    }
+
+    #podium .podium-rank {
+      position: relative;
+      font: 800 39px Rajdhani,sans-serif !important;
+      color: #d0d8e7 !important;
+      margin-bottom: 5px !important;
+    }
+
+    #podium .second .podium-rank {
+      color: #d4deed !important;
+      text-shadow: 0 0 20px #c5d0e255;
+    }
+
+    #podium .first .podium-rank {
+      font-size: 61px !important;
+      color: #ffda75 !important;
+      text-shadow: 0 0 25px #ffcb4f88 !important;
+    }
+
+    #podium .third .podium-rank {
+      color: #d99b70 !important;
+      text-shadow: 0 0 20px #d18b5e55;
+    }
+
+    #podium .podium-skin {
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 92px !important;
+      height: 132px !important;
+      margin: 4px auto 12px !important;
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      overflow: visible !important;
+      z-index: 1 !important;
+    }
+
+    #podium .first .podium-skin {
+      width: 118px !important;
+      height: 166px !important;
+      margin-top: 0 !important;
+    }
+
+    #podium .podium-skin img {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      image-rendering: pixelated !important;
+      filter: drop-shadow(0 8px 9px #0008) !important;
+    }
+
+    #podium .podium-name {
+      position: relative;
+      max-width: 100%;
+      font-size: 16px !important;
+      font-weight: 800 !important;
+      overflow-wrap: anywhere;
+      color: #fff !important;
+      margin: 5px 0 9px !important;
+    }
+
+    #podium .first .podium-name {
+      font-size: 19px !important;
+      color: #ffe4a0 !important;
+    }
+
+    #podium .second .podium-name {
+      color: #e1e8f4 !important;
+    }
+
+    #podium .third .podium-name {
+      color: #f0c09e !important;
+    }
+
+    #podium .podium-tier {
+      border-radius: 8px !important;
+      padding: 6px 16px !important;
+      font-size: 17px !important;
+      background: #ffffff12 !important;
+      border: 1px solid #ffffff20 !important;
+    }
+
+    #podium .first .podium-tier {
+      color: #ffda75 !important;
+      border-color: #d9ae4d66 !important;
+      background: #f5c65b18 !important;
+    }
+
+    #podium .second .podium-tier {
+      color: #d5deed !important;
+      border-color: #aeb9cc55 !important;
+    }
+
+    #podium .third .podium-tier {
+      color: #e5a77c !important;
+      border-color: #bd805855 !important;
+    }
+
+    #podium .podium-points {
+      margin-top: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 1.2px !important;
+      color: #b7c0d4 !important;
+    }
+
+    #podium .first .podium-points {
+      color: #ffda75 !important;
+    }
+
+    #podium .third .podium-points {
+      color: #d99b70 !important;
+    }
+
+    @media (max-width: 650px) {
+      #podium {
+        grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+        gap: 8px !important;
+        min-height: 300px !important;
+        padding: 22px 0 8px !important;
+      }
+
+      #podium .podium-card {
+        padding: 15px 5px !important;
+        min-height: 220px !important;
+        border-radius: 12px !important;
+      }
+
+      #podium .podium-card.second {
+        min-height: 235px !important;
+      }
+
+      #podium .podium-card.first {
+        min-height: 280px !important;
+      }
+
+      #podium .podium-card.third {
+        min-height: 210px !important;
+      }
+
+      #podium .podium-rank {
+        font-size: 29px !important;
+      }
+
+      #podium .first .podium-rank {
+        font-size: 43px !important;
+      }
+
+      #podium .podium-skin {
+        width: 65px !important;
+        height: 95px !important;
+      }
+
+      #podium .first .podium-skin {
+        width: 82px !important;
+        height: 115px !important;
+      }
+
+      #podium .podium-name {
+        font-size: 12px !important;
+      }
+
+      #podium .first .podium-name {
+        font-size: 14px !important;
+      }
+
+      #podium .podium-tier {
+        font-size: 13px !important;
+        padding: 5px 9px !important;
+      }
+
+      #podium .podium-points {
+        font-size: 9px !important;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
 function addDiscordButton() {
   if (document.getElementById("holeFightDiscord")) return;
 
@@ -141,16 +405,6 @@ function addDiscordButton() {
     box-shadow:0 8px 25px rgba(88,101,242,.35);
     transition:transform .2s,background .2s;
   `;
-
-  button.addEventListener("mouseenter", () => {
-    button.style.transform = "translateY(-3px)";
-    button.style.background = "#4752C4";
-  });
-
-  button.addEventListener("mouseleave", () => {
-    button.style.transform = "translateY(0)";
-    button.style.background = "#5865F2";
-  });
 
   document.body.appendChild(button);
 }
@@ -191,14 +445,10 @@ function showTier(player) {
   return `
     <div class="player-row">
       <div class="rank-number">#${player.rank}</div>
-
       <div class="player-identity">
-        <div class="avatar">
-          ${skinAvatar(player.username)}
-        </div>
+        <div class="avatar">${skinAvatar(player.username)}</div>
         <span>${escapeHtml(player.username)}</span>
       </div>
-
       <span class="tier-pill">${escapeHtml(player.tier)}</span>
       <span class="points">${player.points} pts</span>
     </div>
@@ -334,10 +584,7 @@ $("authForm").addEventListener("submit", async e => {
   const password = $("authPassword").value;
 
   if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) {
-    showMessage(
-      "authMessage",
-      "Use 3-16 letters, numbers or underscores."
-    );
+    showMessage("authMessage", "Use 3-16 letters, numbers or underscores.");
     return;
   }
 
@@ -378,12 +625,7 @@ $("authForm").addEventListener("submit", async e => {
           });
         });
 
-        showMessage(
-          "authMessage",
-          "Account created successfully.",
-          true
-        );
-
+        showMessage("authMessage", "Account created successfully.", true);
         closeAuth();
 
       } catch (error) {
@@ -537,16 +779,11 @@ $("tierForm").addEventListener("submit", async e => {
     $("tierUsername").value = "";
 
     await loadLeaderboard(activeList);
-
     toast("Player added successfully.");
 
   } catch (error) {
     console.error(error);
-
-    showMessage(
-      "tierMessage",
-      error.message || "Could not save player."
-    );
+    showMessage("tierMessage", error.message || "Could not save player.");
   }
 });
 
@@ -572,27 +809,18 @@ $("removeForm").addEventListener("submit", async e => {
       doc(db, "players", `${list}_${lower}`)
     );
 
-    showMessage(
-      "removeMessage",
-      "Player removed successfully.",
-      true
-    );
-
+    showMessage("removeMessage", "Player removed successfully.", true);
     $("removeUsername").value = "";
 
     await loadLeaderboard(activeList);
-
     toast("Player removed.");
 
   } catch (error) {
     console.error(error);
-
-    showMessage(
-      "removeMessage",
-      error.message || "Could not remove player."
-    );
+    showMessage("removeMessage", error.message || "Could not remove player.");
   }
 });
 
+installPodiumStyles();
 addDiscordButton();
 loadLeaderboard("premium");
