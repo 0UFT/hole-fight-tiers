@@ -1,13 +1,27 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  onAuthStateChanged, signOut
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
 import {
-  getFirestore, doc, getDoc, setDoc, runTransaction, collection,
-  getDocs, query, where, serverTimestamp, deleteDoc
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  runTransaction,
+  collection,
+  getDocs,
+  query,
+  where,
+  serverTimestamp,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 import { firebaseConfig, ADMIN_UID } from "./firebase-config.js";
 
 const $ = id => document.getElementById(id);
@@ -17,8 +31,16 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const tierPoints = {
-  HT1:1000, HT2:900, HT3:800, HT4:700, HT5:600,
-  LT1:500, LT2:400, LT3:300, LT4:200, LT5:100
+  HT1: 1000,
+  HT2: 900,
+  HT3: 800,
+  HT4: 700,
+  HT5: 600,
+  LT1: 500,
+  LT2: 400,
+  LT3: 300,
+  LT4: 200,
+  LT5: 100
 };
 
 let authMode = "register";
@@ -27,6 +49,7 @@ let currentUser = null;
 let currentUsername = null;
 
 const cleanUsername = value => value.trim().toLowerCase();
+
 const syntheticEmail = username =>
   `${cleanUsername(username)}@holefight-tierlist.com`;
 
@@ -36,9 +59,10 @@ const isConfigured = () =>
   !firebaseConfig.apiKey.includes("PASTE_") &&
   !firebaseConfig.projectId.includes("PASTE_");
 
-function showMessage(id, message, success=false) {
+function showMessage(id, message, success = false) {
   const el = $(id);
   if (!el) return;
+
   el.textContent = message;
   el.classList.toggle("success", success);
 }
@@ -46,31 +70,45 @@ function showMessage(id, message, success=false) {
 function toast(message) {
   const el = $("toast");
   if (!el) return;
+
   el.textContent = message;
   el.classList.add("show");
+
   setTimeout(() => el.classList.remove("show"), 2600);
 }
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
   }[c]));
 }
 
 function initials(name) {
-  return (name || "?").slice(0,2).toUpperCase();
+  return (name || "?").slice(0, 2).toUpperCase();
 }
 
-function skinAvatar(name) {
+function skinAvatar(name, fullBody = false) {
   const safeName = encodeURIComponent(name);
+
+  const imageUrl = fullBody
+    ? `https://mc-heads.net/body/${safeName}/100`
+    : `https://mc-heads.net/avatar/${safeName}/64`;
+
+  const fallbackUrl = fullBody
+    ? "https://mc-heads.net/body/MHF_Steve/100"
+    : "https://mc-heads.net/avatar/MHF_Steve/64";
+
   return `
     <img
-      src="https://mc-heads.net/avatar/${safeName}/64"
-      alt="${escapeHtml(name)} skin"
-      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+      src="${imageUrl}"
+      alt="${escapeHtml(name)}"
+      loading="lazy"
+      onerror="this.onerror=null;this.src='${fallbackUrl}'"
     >
-    <span style="display:none">${escapeHtml(initials(name))}</span>
   `;
 }
 
@@ -78,11 +116,13 @@ function addDiscordButton() {
   if (document.getElementById("holeFightDiscord")) return;
 
   const button = document.createElement("a");
+
   button.id = "holeFightDiscord";
   button.href = "https://discord.gg/bWtAQndZY9";
   button.target = "_blank";
   button.rel = "noopener noreferrer";
   button.textContent = "JOIN DISCORD ↗";
+
   button.style.cssText = `
     position:fixed;
     right:22px;
@@ -115,18 +155,23 @@ function addDiscordButton() {
 
 function setAuthMode(mode) {
   authMode = mode;
+
   $("authTitle").textContent =
     mode === "register" ? "CREATE ACCOUNT" : "WELCOME BACK";
+
   $("authSubtitle").textContent =
     mode === "register"
       ? "Choose a unique username and password."
       : "Login with your Hole Fight account.";
+
   $("authSubmit").textContent =
     mode === "register" ? "Create account" : "Login";
+
   $("authModeSwitch").textContent =
     mode === "register"
       ? "Already have an account? Login"
       : "Don't have an account? Register";
+
   $("authMessage").textContent = "";
   $("authPassword").value = "";
 }
@@ -144,17 +189,21 @@ function showTier(player) {
   return `
     <div class="player-row">
       <div class="rank-number">#${player.rank}</div>
+
       <div class="player-identity">
-        <div class="avatar">${skinAvatar(player.username)}</div>
+        <div class="avatar">
+          ${skinAvatar(player.username)}
+        </div>
         <span>${escapeHtml(player.username)}</span>
       </div>
+
       <span class="tier-pill">${escapeHtml(player.tier)}</span>
       <span class="points">${player.points} pts</span>
     </div>
   `;
 }
 
-async function loadLeaderboard(list=activeList) {
+async function loadLeaderboard(list = activeList) {
   activeList = list;
 
   document.querySelectorAll(".switch-btn").forEach(button => {
@@ -163,6 +212,7 @@ async function loadLeaderboard(list=activeList) {
 
   $("podium").innerHTML =
     '<div class="empty-state">Loading player rankings...</div>';
+
   $("playerList").innerHTML = "";
 
   if (!isConfigured()) {
@@ -184,18 +234,19 @@ async function loadLeaderboard(list=activeList) {
       ...d.data()
     }));
 
-    players.sort((a,b) =>
+    players.sort((a, b) =>
       (Number(b.points) - Number(a.points)) ||
       a.username.localeCompare(b.username)
     );
 
-    players.forEach((player,index) => {
+    players.forEach((player, index) => {
       player.rank = index + 1;
     });
 
     if (!players.length) {
       $("podium").innerHTML =
         '<div class="empty-state">No ranked players yet. Be the first!</div>';
+
       $("playerList").innerHTML = "";
       return;
     }
@@ -207,9 +258,9 @@ async function loadLeaderboard(list=activeList) {
     ].filter(Boolean);
 
     const classes = {
-      1:"second",
-      2:"first",
-      3:"third"
+      1: "second",
+      2: "first",
+      3: "third"
     };
 
     $("podium").innerHTML = podiumOrder.map(player => {
@@ -218,18 +269,31 @@ async function loadLeaderboard(list=activeList) {
       return `
         <article class="podium-card ${cls}">
           <div class="podium-rank">${player.rank}</div>
-          <div class="avatar">${skinAvatar(player.username)}</div>
-          <div class="podium-name">${escapeHtml(player.username)}</div>
-          <span class="podium-tier">${escapeHtml(player.tier)}</span>
-          <div class="podium-points">${player.points} POINTS</div>
+
+          <div class="avatar podium-skin">
+            ${skinAvatar(player.username, true)}
+          </div>
+
+          <div class="podium-name">
+            ${escapeHtml(player.username)}
+          </div>
+
+          <span class="podium-tier">
+            ${escapeHtml(player.tier)}
+          </span>
+
+          <div class="podium-points">
+            ${player.points} POINTS
+          </div>
         </article>
       `;
     }).join("");
 
     $("playerList").innerHTML = players.map(showTier).join("");
 
-  } catch(error) {
+  } catch (error) {
     console.error("Leaderboard error:", error);
+
     $("podium").innerHTML =
       '<div class="empty-state">Could not load rankings. Check Firestore rules.</div>';
   }
@@ -250,7 +314,9 @@ $("authModeSwitch").addEventListener("click", () => {
 });
 
 document.querySelectorAll(".switch-btn").forEach(button => {
-  button.addEventListener("click", () => loadLeaderboard(button.dataset.list));
+  button.addEventListener("click", () => {
+    loadLeaderboard(button.dataset.list);
+  });
 });
 
 $("authForm").addEventListener("submit", async e => {
@@ -266,12 +332,15 @@ $("authForm").addEventListener("submit", async e => {
   const password = $("authPassword").value;
 
   if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) {
-    showMessage("authMessage", "Use 3-16 letters, numbers or underscores.");
+    showMessage(
+      "authMessage",
+      "Use 3-16 letters, numbers or underscores."
+    );
     return;
   }
 
   if (password.length < 8) {
-    showMessage("authMessage", "Password must have at least 8 characters.");
+    showMessage("authMessage", "Use at least 8 characters.");
     return;
   }
 
@@ -307,10 +376,15 @@ $("authForm").addEventListener("submit", async e => {
           });
         });
 
-        showMessage("authMessage", "Account created successfully.", true);
+        showMessage(
+          "authMessage",
+          "Account created successfully.",
+          true
+        );
+
         closeAuth();
 
-      } catch(error) {
+      } catch (error) {
         await signOut(auth);
         await credential.user.delete();
         throw error;
@@ -323,7 +397,9 @@ $("authForm").addEventListener("submit", async e => {
         password
       );
 
-      const profile = await getDoc(doc(db, "users", credential.user.uid));
+      const profile = await getDoc(
+        doc(db, "users", credential.user.uid)
+      );
 
       if (!profile.exists()) {
         await signOut(auth);
@@ -333,7 +409,7 @@ $("authForm").addEventListener("submit", async e => {
       closeAuth();
     }
 
-  } catch(error) {
+  } catch (error) {
     let message = error.message || "Something went wrong.";
 
     if (error.message === "USERNAME_TAKEN") {
@@ -360,10 +436,14 @@ onAuthStateChanged(auth, async user => {
 
   if (user) {
     try {
-      const profile = await getDoc(doc(db, "users", user.uid));
+      const profile = await getDoc(
+        doc(db, "users", user.uid)
+      );
+
       currentUsername = profile.exists()
         ? profile.data().username
         : null;
+
     } catch {
       currentUsername = null;
     }
@@ -381,6 +461,7 @@ onAuthStateChanged(auth, async user => {
 
   } else {
     currentUsername = null;
+
     $("authActions").classList.remove("hidden");
     $("userActions").classList.add("hidden");
     $("adminOpen").classList.add("hidden");
@@ -434,13 +515,16 @@ $("tierForm").addEventListener("submit", async e => {
   }
 
   try {
-    await setDoc(doc(db, "players", `${list}_${lower}`), {
-      username,
-      list,
-      tier,
-      points: tierPoints[tier],
-      updatedAt: serverTimestamp()
-    });
+    await setDoc(
+      doc(db, "players", `${list}_${lower}`),
+      {
+        username,
+        list,
+        tier,
+        points: tierPoints[tier],
+        updatedAt: serverTimestamp()
+      }
+    );
 
     showMessage(
       "tierMessage",
@@ -451,11 +535,16 @@ $("tierForm").addEventListener("submit", async e => {
     $("tierUsername").value = "";
 
     await loadLeaderboard(activeList);
+
     toast("Player added successfully.");
 
-  } catch(error) {
+  } catch (error) {
     console.error(error);
-    showMessage("tierMessage", error.message || "Could not save player.");
+
+    showMessage(
+      "tierMessage",
+      error.message || "Could not save player."
+    );
   }
 });
 
@@ -477,17 +566,29 @@ $("removeForm").addEventListener("submit", async e => {
   }
 
   try {
-    await deleteDoc(doc(db, "players", `${list}_${lower}`));
+    await deleteDoc(
+      doc(db, "players", `${list}_${lower}`)
+    );
 
-    showMessage("removeMessage", "Player removed successfully.", true);
+    showMessage(
+      "removeMessage",
+      "Player removed successfully.",
+      true
+    );
+
     $("removeUsername").value = "";
 
     await loadLeaderboard(activeList);
+
     toast("Player removed.");
 
-  } catch(error) {
+  } catch (error) {
     console.error(error);
-    showMessage("removeMessage", error.message || "Could not remove player.");
+
+    showMessage(
+      "removeMessage",
+      error.message || "Could not remove player."
+    );
   }
 });
 
