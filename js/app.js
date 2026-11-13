@@ -30,18 +30,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+
 const tierPoints = {
   HT1: 1000,
-  HT2: 900,
-  HT3: 800,
-  HT4: 700,
-  HT5: 600,
-  LT1: 500,
-  LT2: 400,
-  LT3: 300,
-  LT4: 200,
+  LT1: 900,
+  HT2: 800,
+  LT2: 700,
+  HT3: 600,
+  LT3: 500,
+  HT4: 400,
+  LT4: 300,
+  HT5: 200,
   LT5: 100
 };
+
 
 let authMode = "register";
 let activeList = "premium";
